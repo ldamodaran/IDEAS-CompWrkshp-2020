@@ -1,0 +1,64 @@
+---
+title: "IDEAS Comp Bio workshop 2020"
+author: "Lambodhar Damodaran"
+date: "5/19/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Libraries needed
+
+
+
+```{r}
+library(lubridate)
+library(ggplot2)
+library(plotly)
+```
+
+
+
+## R Markdown
+
+Reading in data file for mers and manipulating to determine days since onset of epidemic, reformmating date information. 
+
+```{r}
+mers <- read.csv('cases.csv')
+mers$hospitalized[890] <- c('2015-02-20')
+mers <- mers[-471,]
+mers$onset2 <- ymd(mers$onset)
+mers$hospitalized2 <- ymd(mers$hospitalized)
+class(mers$onset2)
+
+day0 <- min(na.omit(mers$onset2))
+mers$epi.day <- as.numeric(mers$onset2 - day0)
+```
+
+##Plots data
+
+Plotting MERS epidemnic day vs case count using ggplot. 
+
+```{r}
+ggplot(data=mers) +
+  geom_bar(mapping = aes(x=epi.day)) +
+  labs(x='Epidemic day', y='Case count', title = 'Global MERS case count by dat of onset', caption = 'Data from Rambaut - MERS')
+
+
+```
+
+
+## Interactive plotly plot
+
+
+```{r}
+
+epi.curve <- ggplot(data=mers) +
+  geom_bar(mapping=aes(x=epi.day)) +
+  labs(x='Epidemic day', y='Case count', title='Global MERS case count by onset date', caption = 'Data from Rambaut - MERS')
+
+ggplotly(epi.curve)
+```
